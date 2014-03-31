@@ -15,7 +15,7 @@
     
     <!--Main screen show formular, it's 1 listbox, with item template-->
     <Grid x:Name="LayoutRoot" Background="Transparent">
-        <ListBox x:Name="listCal" VerticalAlignment="Top" ScrollViewer.VerticalScrollBarVisibility="Auto"  Margin="5,5,5,5" MinHeight="200" ItemsSource="{Binding listObject}" SelectionChanged="listCal_SelectionChanged">
+        <ListBox x:Name="listCal" FontSize="{StaticResource PhoneFontSizeMedium}" VerticalAlignment="Top" ScrollViewer.VerticalScrollBarVisibility="Auto"  Margin="5,5,5,5" MinHeight="200" ItemsSource="{Binding listObject}" SelectionChanged="listCal_SelectionChanged">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                         <Grid ShowGridLines="True">
