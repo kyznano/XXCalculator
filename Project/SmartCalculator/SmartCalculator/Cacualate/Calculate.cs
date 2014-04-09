@@ -38,78 +38,76 @@ namespace SmartCalculator.Cacualate
             return CalComponent(backup_input);
         }
 
-        public String CalComponent(String i)
+        public String CalComponent(String expression)
         {
-            String s = i;
-            bool o = true;
-            while (o)
+            String calculatedExp = expression;
+            bool parenthesis = true;
+            // replace "(expression)" by calculated expression
+            while (parenthesis)
             {
-                String res = ExtractComponents(s);
-                if (res == null) o = false;
-                else
-                {
-                    String new_res = CalComponent(res);
-                    s = s.Replace('(' + res + ')', new_res);
-                }
+                String noneParenthesis = ExtractComponents(expression);
+                if (noneParenthesis == null) parenthesis = false;
+                else calculatedExp = expression.Replace('(' + noneParenthesis + ')', CalComponent(noneParenthesis));
             }
-            String de = "+-*/";
-            char[] delimiter = de.ToCharArray();
-            if(s.Contains('+'))
+            String operationsString = "+-*/";
+            char[] operations = operationsString.ToCharArray();
+            if(calculatedExp.Contains('+'))
             {
-                String[] spl = s.Split('+');
-                float res = 0;
-                foreach(String addend in spl)
+                String[] addends = calculatedExp.Split('+');
+                float sum = 0;
+                foreach(String addend in addends)
                 {
                     //s = s.Replace(left + '+' + right, float(CalComponent(left)) + float(CalComponent(right)));
-                    res += float.Parse(CalComponent(addend));
+                    sum += float.Parse(CalComponent(addend));
                 }
-                s = res.ToString();
-                //return "0";
-            } else if(s.Contains('-'))
-            {
-                String[] spl = s.Split('-');
-                float res = 0;
-                bool first = true;
-                foreach(String addend in spl)
-                {
-                    //s = s.Replace(left + '+' + right, float(CalComponent(left)) + float(CalComponent(right)));
-                    if (first) { res = float.Parse(CalComponent(addend)); first = false; }
-                    else res -= float.Parse(CalComponent(addend));
-                }
-                s = res.ToString();
+                calculatedExp = sum.ToString();
             }
-            else if (s.Contains('*'))
+            else if (calculatedExp.Contains('-'))
             {
-                String[] spl = s.Split('*');
-                float res = 1;
-                foreach (String addend in spl)
+                String[] elements = calculatedExp.Split('-');
+                float sub = 0;
+                bool firstElement = true;
+                foreach (String element in elements)
                 {
-                    //s = s.Replace(left + '+' + right, float(CalComponent(left)) + float(CalComponent(right)));
-                    res = res*float.Parse(CalComponent(addend));
+                    if (firstElement) { sub = float.Parse(CalComponent(element)); firstElement = false; }
+                    else sub -= float.Parse(CalComponent(element));
                 }
-                s = res.ToString();
+                calculatedExp = sub.ToString();
             }
-            else if (s.Contains('/'))
+            else if (calculatedExp.Contains('*'))
             {
-                String[] spl = s.Split('/');
-                float res = 0;
-                bool first = true;
-                foreach (String addend in spl)
+                String[] elements = calculatedExp.Split('*');
+                float mul = 1;
+                foreach (String element in elements)
                 {
-                    //s = s.Replace(left + '+' + right, float(CalComponent(left)) + float(CalComponent(right)));
-                    if (first) { res = float.Parse(CalComponent(addend)); first = false; }
-                    else res = res / float.Parse(CalComponent(addend));                    
+                    mul *= float.Parse(CalComponent(element));
                 }
-                s = res.ToString();
+                calculatedExp = mul.ToString();
             }
-            return s;
+            else if (calculatedExp.Contains('/'))
+            {
+                String[] elements = calculatedExp.Split('/');
+                float div = 0;
+                bool firstElement = true;
+                foreach (String element in elements)
+                {
+                    if (firstElement) { div = float.Parse(CalComponent(element)); firstElement = false; }
+                    else div = div / float.Parse(CalComponent(element));                    
+                }
+                calculatedExp = div.ToString();
+            }
+            else if (calculatedExp.Contains('.'))
+            {
+                
+            }
+            return calculatedExp;
         }
 
-        public String ExtractComponents(String i)
+        public String ExtractComponents(String expression)
         {
-            if (i.Contains(')'))
+            if (expression.Contains(')'))    // extract character "(" and ")"
             {
-                    String tail = i.Split(')')[0];
+                    String tail = expression.Split(')')[0];
                     String[] tail_split = tail.Split('(');
                     return tail_split[tail_split.Length-1];
             }
