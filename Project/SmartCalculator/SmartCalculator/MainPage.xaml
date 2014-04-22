@@ -84,7 +84,7 @@
                         <ImageBrush ImageSource="Assets/Mu3.PNG"/>
                     </Button>
                     <Button Grid.Row="1" Grid.Column="4" Style="{StaticResource BoundButton}" Content="Log"
-                            Command="{Binding AddStringCMD}" CommandParameter="Log()()"/>
+                            Command="{Binding AddStringCMD}" CommandParameter="()Log()"/>
                     <Button Grid.Row="1" Grid.Column="5" Grid.ColumnSpan="2" Style="{StaticResource SquareButton}" Content="DEL"
                             Command="{Binding DelCharCMD}"/>
 

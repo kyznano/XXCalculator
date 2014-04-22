@@ -16,13 +16,31 @@ namespace SmartCalculator.Cacualate
 
         // some constant values
         String exponent = "2.718281828";
-        String pi = "3.141592654";
+        String pi = Math.PI.ToString();
+
+        String CONST_EMPTY = "";
+        String CONST_FALSE = "False";
+        String CONST_ADD = "+";
+        String CONST_SUBTRACT = "-";
+        String CONST_MULTIPLY = "*";
+        String CONST_DIVIDE = "/";
+        String CONST_POWER = "^";
+        String CONST_SQRT = "√";
+        String CONST_LOG = "Log";
+        String CONST_FACTORIAL = "!";
+        String CONST_SIN = "Sin";
+        String CONST_COS = "Cos";
+        String CONST_TAN = "Tan";
+        String CONST_RANDOM = "Ran";
+        String CONST_PI = "π";
+        String CONST_EXPONENT = "e";
 
         //constructor
         public Calculate(String seq)
         {
             formular = seq;
             backup_input = seq.Replace("_", "");
+            answer = null;
         }
 
         public String ErrorString
@@ -49,6 +67,7 @@ namespace SmartCalculator.Cacualate
             String calculatedExp = expression;
             bool parenthesis = true;
             calculatedExp = ReplaceConstants(expression);
+            if (calculatedExp == CONST_FALSE) return CONST_FALSE;
             // replace "(expression)" by calculated expression
             while (parenthesis)
             {
@@ -56,22 +75,20 @@ namespace SmartCalculator.Cacualate
                 if (noneParenthesis == null) parenthesis = false;
                 else calculatedExp = calculatedExp.Replace('(' + noneParenthesis + ')', CalComponent(noneParenthesis));
             }
-            String operationsString = "+-*/";
-            char[] operations = operationsString.ToCharArray();
-            if(calculatedExp.Contains('+'))
+
+            if(calculatedExp.Contains(CONST_ADD))
             {
-                String[] addends = calculatedExp.Split('+');
+                String[] addends = calculatedExp.Split(CONST_ADD.ToCharArray());
                 double sum = 0;
                 foreach(String addend in addends)
                 {
-                    //s = s.Replace(left + '+' + right, float(CalComponent(left)) + float(CalComponent(right)));
                     sum += double.Parse(CalComponent(addend));
                 }
                 calculatedExp = sum.ToString();
             }
-            else if (calculatedExp.Contains('-'))
+            else if (calculatedExp.Contains(CONST_SUBTRACT))
             {
-                String[] elements = calculatedExp.Split('-');
+                String[] elements = calculatedExp.Split(CONST_SUBTRACT.ToCharArray());
                 double sub = 0;
                 bool firstElement = true;
                 foreach (String element in elements)
@@ -81,9 +98,9 @@ namespace SmartCalculator.Cacualate
                 }
                 calculatedExp = sub.ToString();
             }
-            else if (calculatedExp.Contains('*'))
+            else if (calculatedExp.Contains(CONST_MULTIPLY))
             {
-                String[] elements = calculatedExp.Split('*');
+                String[] elements = calculatedExp.Split(CONST_MULTIPLY.ToCharArray());
                 double mul = 1;
                 foreach (String element in elements)
                 {
@@ -91,9 +108,9 @@ namespace SmartCalculator.Cacualate
                 }
                 calculatedExp = mul.ToString();
             }
-            else if (calculatedExp.Contains('/'))
+            else if (calculatedExp.Contains(CONST_DIVIDE))
             {
-                String[] elements = calculatedExp.Split('/');
+                String[] elements = calculatedExp.Split(CONST_DIVIDE.ToCharArray());
                 double div = 0;
                 bool firstElement = true;
                 foreach (String element in elements)
@@ -103,21 +120,55 @@ namespace SmartCalculator.Cacualate
                 }
                 calculatedExp = div.ToString();
             }
-            else if (calculatedExp.Contains('^'))
+            else if (calculatedExp.Contains(CONST_POWER))
             {
-                String[] powerComponents = calculatedExp.Split('^');
+                String[] powerComponents = calculatedExp.Split(CONST_POWER.ToCharArray());
                 double powerResult = Math.Pow(double.Parse(CalComponent(powerComponents[0])), double.Parse(CalComponent(powerComponents[1])));
-                calculatedExp = calculatedExp.Replace(powerComponents[0] + "^" + powerComponents[1], powerResult.ToString());
+                calculatedExp = calculatedExp.Replace(powerComponents[0] + CONST_POWER + powerComponents[1], powerResult.ToString());
                 if (powerComponents.Length > 2)
                 {
                     calculatedExp = CalComponent(calculatedExp);
                 }
             }
-            else if (calculatedExp.Contains('!'))   // support one factorial symbol (!) only
+            else if (calculatedExp.Contains(CONST_FACTORIAL))   // support only one factorial symbol (!)
             {
-                calculatedExp = calculatedExp.Replace("!", "");
+                calculatedExp = calculatedExp.Replace(CONST_FACTORIAL, CONST_EMPTY);
                 double factorialResult = Factorial(double.Parse(CalComponent(calculatedExp)));
                 calculatedExp = factorialResult.ToString();
+            }
+            else if (calculatedExp.Contains(CONST_SIN)) // problem: Sin(π) isn't equal to 0
+            {
+                calculatedExp = calculatedExp.Replace(CONST_SIN, CONST_EMPTY);
+                calculatedExp = Math.Sin(double.Parse(calculatedExp)).ToString();                
+            }
+            else if (calculatedExp.Contains(CONST_COS))
+            {
+                calculatedExp = calculatedExp.Replace(CONST_COS, CONST_EMPTY);
+                calculatedExp = Math.Cos(double.Parse(calculatedExp)).ToString();
+            }
+            else if (calculatedExp.Contains(CONST_TAN))
+            {
+                calculatedExp = calculatedExp.Replace(CONST_TAN, CONST_EMPTY);
+                calculatedExp = Math.Tan(double.Parse(calculatedExp)).ToString();
+            }
+            else if (calculatedExp.Contains(CONST_SQRT))
+            {
+                String[] elements = calculatedExp.Split(CONST_SQRT.ToCharArray());
+                if (elements[0].Length > 0)
+                {
+                    calculatedExp = Math.Pow(double.Parse(elements[1]), 1.0 / double.Parse(elements[0])).ToString();
+                }
+                else
+                {
+                    calculatedExp = Math.Sqrt(double.Parse(elements[1])).ToString();
+                }                
+            }
+            else if (calculatedExp.Contains(CONST_LOG))
+            {
+                String tempOperator = "|";
+                calculatedExp = calculatedExp.Replace(CONST_LOG, tempOperator);
+                String[] elements = calculatedExp.Split(tempOperator.ToCharArray());
+                calculatedExp = Math.Log(double.Parse(elements[1]), double.Parse(elements[0])).ToString();
             }
             return calculatedExp;
         }
@@ -160,17 +211,25 @@ namespace SmartCalculator.Cacualate
         public String ReplaceConstants(String expression)
         {
             String replacement = expression;
-            if (expression.Contains("e"))
+            if (expression.Contains(CONST_EXPONENT))
             {
-                replacement = expression.Replace("e", exponent);
+                replacement = expression.Replace(CONST_EXPONENT, exponent);
             }
-            else if (expression.Contains("π"))
+            else if (expression.Contains(CONST_PI))
             {
-                replacement = expression.Replace("π", pi);
+                replacement = expression.Replace(CONST_PI, pi);
             }
             /*else if (expression.Contains("Ran"))
             {
                 replacement = expression.Replace("Ran", "0");
+            }*/
+            /*else if (expression.Contains("Ans"))
+            {
+                if (answer == null)
+                {
+                    return CONST_FALSE;
+                }
+                replacement = expression.Replace("Ans", answer);
             }*/
             return replacement;
         }
